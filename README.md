@@ -98,12 +98,7 @@ curl -i -X POST -H "X-User-Type: Watcher" -H "Content-Type: application/json" -d
     cd zpe-cloud-user-management-service
     ```
 
-2. Create a `.env` file with the following content:
-    ```env
-    SERVER_PORT=8080
-    ```
-
-3. Run the application locally using the following command:
+2. Run the application locally using the following command:
     ```bash
     go run cmd/server/main.go
     ```
