@@ -9,17 +9,20 @@ import (
 	internalMsgs "zpe-cloud-user-management-service/internal/msgs"
 )
 
+// roleHierarchy defines the hierarchy of roles and their allowed subordinate roles.
 var roleHierarchy = map[string][]string{
 	"Admin":    {"Modifier", "Watcher"},
 	"Modifier": {"Watcher"},
 	"Watcher":  {},
 }
 
+// isRoleExists checks if a role exists in the role hierarchy.
 func isRoleExists(role string) bool {
 	_, exists := roleHierarchy[role]
 	return exists
 }
 
+// isValidCrudOperation checks if the current user's role can perform CRUD operations on the target user's role.
 func isValidCrudOperation(currentUserRole, targetUserRole string) bool {
 	if currentUserRole == "Admin" {
 		return true
@@ -34,6 +37,7 @@ func isValidCrudOperation(currentUserRole, targetUserRole string) bool {
 	return false
 }
 
+// checkPermission checks if the current user has permission to perform actions on the required role.
 func checkPermission(w http.ResponseWriter, currentUserRole, requiredRole string) bool {
 	if !isRoleExists(currentUserRole) || !isValidCrudOperation(currentUserRole, requiredRole) {
 		errResponse(w, http.StatusForbidden, internalMsgs.ErrForbidden)
@@ -43,6 +47,7 @@ func checkPermission(w http.ResponseWriter, currentUserRole, requiredRole string
 	return true
 }
 
+// isValidRoleUpdate checks if the new roles can be assigned by the current user.
 func isValidRoleUpdate(newRoles []string, sessionUserRole string) error {
 	for _, role := range newRoles {
 		if !isRoleExists(role) {
