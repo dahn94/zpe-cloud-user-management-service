@@ -95,7 +95,7 @@ curl -i -X POST -H "X-User-Type: Watcher" -H "Content-Type: application/json" -d
 #### Running Locally
 1. Clone the repository:
     ```bash
-    git clone https://github.com/your-repo/zpe-cloud-user-management-service.git
+    git clone https://github.com/dahn94/zpe-cloud-user-management-service.git
     cd zpe-cloud-user-management-service
     ```
 
