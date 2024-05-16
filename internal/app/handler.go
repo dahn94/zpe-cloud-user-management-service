@@ -58,7 +58,7 @@ func HandleCreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := user.Validate(); err != nil {
+	if err := user.ValidateRequiredFields(); err != nil {
 		errResponse(w, http.StatusBadRequest, err)
 		log.Printf("BadRequest: %v", err)
 		return
