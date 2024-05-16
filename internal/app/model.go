@@ -1,6 +1,9 @@
 package app
 
-import "errors"
+import (
+	"errors"
+	"strings"
+)
 
 // User represents a user in the system with ID, Name, Email, and Roles.
 type User struct {
@@ -10,16 +13,22 @@ type User struct {
 	Roles []string `json:"roles"`
 }
 
-// Validate checks that the user has all necessary fields filled out.
-func (u *User) Validate() error {
+// ValidateRequiredFields checks that the user has all necessary fields filled out.
+func (u *User) ValidateRequiredFields() error {
+	var missingFields []string
+
 	if u.Name == "" {
-		return errors.New("name is required")
+		missingFields = append(missingFields, "name")
 	}
 	if u.Email == "" {
-		return errors.New("email is required")
+		missingFields = append(missingFields, "email")
 	}
 	if len(u.Roles) == 0 {
-		return errors.New("roles are required")
+		missingFields = append(missingFields, "roles")
+	}
+
+	if len(missingFields) > 0 {
+		return errors.New("fields required: " + strings.Join(missingFields, ", "))
 	}
 	return nil
 }
