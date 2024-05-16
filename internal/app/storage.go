@@ -13,6 +13,7 @@ var (
 	idCounter int
 )
 
+// InitializeStorage sets up the in-memory storage for users.
 func InitializeStorage() {
 	mu.Lock()
 	defer mu.Unlock()
@@ -30,6 +31,7 @@ func CreateUser(user *User) error {
 		}
 	}
 
+	// Assign a new unique ID to the user and add them to the storage.
 	idCounter++
 	user.ID = strconv.Itoa(idCounter)
 	users[user.ID] = user

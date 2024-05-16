@@ -12,6 +12,7 @@ type RoleUpdateRequest struct {
 	Roles []string `json:"roles"`
 }
 
+// HandleUsers handles HTTP requests for the /users endpoint.
 func HandleUsers(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost:
@@ -24,6 +25,7 @@ func HandleUsers(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// HandleUser handles HTTP requests for individual user operations at /users/{id}.
 func HandleUser(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
@@ -36,6 +38,7 @@ func HandleUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// HandleUserRoles handles HTTP requests for updating user roles at /users/roles/{id}.
 func HandleUserRoles(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPut:
