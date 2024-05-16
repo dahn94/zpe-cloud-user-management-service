@@ -126,7 +126,7 @@ func HandleGetUser(w http.ResponseWriter, r *http.Request) {
 			jsonResponse(w, http.StatusOK, users)
 			log.Printf("User not found. Returning list of all users")
 		} else {
-			jsonResponse(w, http.StatusOK, []*User{})
+			jsonResponse(w, http.StatusNotFound, []*User{})
 			log.Printf("User not found. No users in the system. Returning empty list")
 		}
 		return
