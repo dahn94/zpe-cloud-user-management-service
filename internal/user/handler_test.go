@@ -221,7 +221,7 @@ func TestHandleGetUser(t *testing.T) {
 			name:           "Get non-existent user with empty list",
 			userType:       "Admin",
 			userID:         "999",
-			expectedStatus: http.StatusOK,
+			expectedStatus: http.StatusNotFound,
 			expectedBody:   `[]`,
 		},
 	}
