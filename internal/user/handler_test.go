@@ -1,4 +1,4 @@
-package app
+package user
 
 import (
 	"bytes"
@@ -23,7 +23,7 @@ func setupTestStorageWithUsers() {
 
 	for i, user := range users {
 		if err := CreateUser(user); err != nil {
-			log.Fatalf("Failed to create app%d: %v", i+1, err)
+			log.Fatalf("Failed to create user%d: %v", i+1, err)
 		}
 	}
 }
@@ -38,7 +38,7 @@ func TestHandleCreateUser(t *testing.T) {
 		expectedBody   string
 	}{
 		{
-			name:     "Admin can create app at same level",
+			name:     "Admin can create user at same level",
 			userType: "Admin",
 			payload: User{
 				Name:  "Jar Jar Binks",
@@ -49,7 +49,7 @@ func TestHandleCreateUser(t *testing.T) {
 			expectedBody:   `{"id":"1","message":"User created successfully"}`,
 		},
 		{
-			name:     "Admin can create app at modifier level",
+			name:     "Admin can create user at modifier level",
 			userType: "Admin",
 			payload: User{
 				Name:  "Darth Vader",
@@ -60,7 +60,7 @@ func TestHandleCreateUser(t *testing.T) {
 			expectedBody:   `{"id":"2","message":"User created successfully"}`,
 		},
 		{
-			name:     "Admin can create app at watcher level",
+			name:     "Admin can create user at watcher level",
 			userType: "Admin",
 			payload: User{
 				Name:  "Yoda",
@@ -71,7 +71,7 @@ func TestHandleCreateUser(t *testing.T) {
 			expectedBody:   `{"id":"3","message":"User created successfully"}`,
 		},
 		{
-			name:     "Admin can create app with more than one role",
+			name:     "Admin can create user with more than one role",
 			userType: "Admin",
 			payload: User{
 				Name:  "Padmé Amidala",
@@ -82,7 +82,7 @@ func TestHandleCreateUser(t *testing.T) {
 			expectedBody:   `{"id":"4","message":"User created successfully"}`,
 		},
 		{
-			name:     "User creation fails if app already exists",
+			name:     "User creation fails if user already exists",
 			userType: "Admin",
 			payload: User{
 				Name:  "Yoda",
@@ -93,7 +93,7 @@ func TestHandleCreateUser(t *testing.T) {
 			expectedBody:   `{"message":"user already exists"}`,
 		},
 		{
-			name:     "Modifier cannot create app at same level",
+			name:     "Modifier cannot create user at same level",
 			userType: "Modifier",
 			payload: User{
 				Name:  "Chewbacca",
@@ -156,7 +156,7 @@ func TestHandleListUsers(t *testing.T) {
 			expectedStatus: http.StatusOK,
 		},
 		{
-			name:           "Unknown app cannot list users",
+			name:           "Unknown user cannot list users",
 			userType:       "Unknown",
 			expectedStatus: http.StatusForbidden,
 		},
@@ -192,21 +192,21 @@ func TestHandleGetUser(t *testing.T) {
 		expectedBody   string
 	}{
 		{
-			name:           "Admin can get app",
+			name:           "Admin can get user",
 			userType:       "Admin",
 			userID:         "1",
 			expectedStatus: http.StatusOK,
 			expectedBody:   `[{"id":"1","name":"Leia Organa","email":"leia@example.com","roles":["Admin"]}]`,
 		},
 		{
-			name:           "Unknown cannot get app",
+			name:           "Unknown cannot get user",
 			userType:       "Unknown",
 			userID:         "1",
 			expectedStatus: http.StatusForbidden,
 			expectedBody:   `{"message":"forbidden"}`,
 		},
 		{
-			name:           "Get non-existent app",
+			name:           "Get non-existent user",
 			userType:       "Admin",
 			userID:         "999",
 			expectedStatus: http.StatusOK,
@@ -218,7 +218,7 @@ func TestHandleGetUser(t *testing.T) {
 							{"id":"6","name":"Goku","email":"goku@example","roles":["Admin"]}]`,
 		},
 		{
-			name:           "Get non-existent app with empty list",
+			name:           "Get non-existent user with empty list",
 			userType:       "Admin",
 			userID:         "999",
 			expectedStatus: http.StatusOK,
@@ -228,7 +228,7 @@ func TestHandleGetUser(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.name == "Get non-existent app with empty list" {
+			if tt.name == "Get non-existent user with empty list" {
 				InitializeStorage() // Clear storage for this test
 			}
 
@@ -272,42 +272,42 @@ func TestHandleDeleteUser(t *testing.T) {
 		expectedBody   string
 	}{
 		{
-			name:           "Admin can delete modifier app",
+			name:           "Admin can delete modifier user",
 			userType:       "Admin",
 			userID:         "1",
 			expectedStatus: http.StatusNoContent,
 			expectedBody:   `{"message":"User deleted successfully"}`,
 		},
 		{
-			name:           "Admin can delete watcher app",
+			name:           "Admin can delete watcher user",
 			userType:       "Admin",
 			userID:         "2",
 			expectedStatus: http.StatusNoContent,
 			expectedBody:   `{"message":"User deleted successfully"}`,
 		},
 		{
-			name:           "Modifier can delete watcher app",
+			name:           "Modifier can delete watcher user",
 			userType:       "Modifier",
 			userID:         "3",
 			expectedStatus: http.StatusNoContent,
 			expectedBody:   `{"message":"User deleted successfully"}`,
 		},
 		{
-			name:           "Modifier cannot delete admin app",
+			name:           "Modifier cannot delete admin user",
 			userType:       "Modifier",
 			userID:         "4",
 			expectedStatus: http.StatusForbidden,
 			expectedBody:   `{"message":"forbidden"}`,
 		},
 		{
-			name:           "Watcher cannot delete any app",
+			name:           "Watcher cannot delete any user",
 			userType:       "Watcher",
 			userID:         "5", // ID of Goku (Admin)
 			expectedStatus: http.StatusForbidden,
 			expectedBody:   `{"message":"forbidden"}`,
 		},
 		{
-			name:           "Delete non-existent app",
+			name:           "Delete non-existent user",
 			userType:       "Admin",
 			userID:         "999",
 			expectedStatus: http.StatusNotFound,

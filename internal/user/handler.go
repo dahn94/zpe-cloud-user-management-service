@@ -1,4 +1,4 @@
-package app
+package user
 
 import (
 	"encoding/json"
@@ -66,7 +66,7 @@ func HandleCreateUser(w http.ResponseWriter, r *http.Request) {
 
 	if !isValidCrudOperation(currentUserRole, user.Roles[0]) {
 		errResponse(w, http.StatusForbidden, internalMsgs.ErrInsufficientPermissions)
-		log.Printf("Forbidden: UserType=%s attempted to create a app", currentUserRole)
+		log.Printf("Forbidden: UserType=%s attempted to create a user", currentUserRole)
 		return
 	}
 	if err := CreateUser(&user); err != nil {
@@ -104,7 +104,7 @@ func HandleGetUser(w http.ResponseWriter, r *http.Request) {
 	currentUserRole := r.Header.Get("X-User-Type")
 	if !isRoleExists(currentUserRole) {
 		errResponse(w, http.StatusForbidden, internalMsgs.ErrForbidden)
-		log.Printf("Forbidden: UserType=%s attempted to get a app", currentUserRole)
+		log.Printf("Forbidden: UserType=%s attempted to get a user", currentUserRole)
 		return
 	}
 	id := strings.TrimPrefix(r.URL.Path, "/users/")
@@ -157,7 +157,7 @@ func HandleDeleteUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusNoContent)
-	log.Printf("UserType=%s deleted app %s", currentUserRole, id)
+	log.Printf("UserType=%s deleted user %s", currentUserRole, id)
 }
 
 func HandleUpdateUserRoles(w http.ResponseWriter, r *http.Request) {
