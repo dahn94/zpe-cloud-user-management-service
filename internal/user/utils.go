@@ -1,4 +1,4 @@
-package app
+package user
 
 import (
 	"encoding/json"
@@ -84,5 +84,5 @@ func getUserTypeByID(id string) (string, error) {
 	if len(user.Roles) > 0 {
 		return user.Roles[0], nil
 	}
-	return "", errors.New("app has no roles")
+	return "", errors.New("user has no roles")
 }

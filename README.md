@@ -10,7 +10,7 @@ The microservice is built using Golang and is structured into several packages:
 
 - `cmd/server`: Contains the main entry point for the application.
 - `config`: Handles configuration loading.
-- `internal/app`: Contains the business logic for user management, including handlers, models, and storage.
+- `internal/user`: Contains the business logic for user management, including handlers, models, and storage.
 - `internal/msgs`: Contains response messages.
 
 ### Endpoints
@@ -114,5 +114,5 @@ curl -i -X POST -H "X-User-Type: Watcher" -H "Content-Type: application/json" -d
 ### Testing
 Run the tests using the following command:
 ```bash
-go test -v ./internal/app
+go test -v ./internal/user
 ```

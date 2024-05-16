@@ -4,13 +4,13 @@ import (
 	"log"
 	"net/http"
 	"zpe-cloud-user-management-service/config"
-	"zpe-cloud-user-management-service/internal/app"
+	"zpe-cloud-user-management-service/internal/user"
 )
 
 func main() {
 	cfg := config.LoadConfig()
 
-	app.InitializeStorage()
+	user.InitializeStorage()
 
 	mux := http.NewServeMux()
 
@@ -21,7 +21,7 @@ func main() {
 }
 
 func setupRoutes(mux *http.ServeMux) {
-	mux.Handle("/users", http.HandlerFunc(app.HandleUsers))
-	mux.Handle("/users/", http.HandlerFunc(app.HandleUser))
-	mux.Handle("/users/roles/", http.HandlerFunc(app.HandleUserRoles))
+	mux.Handle("/users", http.HandlerFunc(user.HandleUsers))
+	mux.Handle("/users/", http.HandlerFunc(user.HandleUser))
+	mux.Handle("/users/roles/", http.HandlerFunc(user.HandleUserRoles))
 }
