@@ -12,6 +12,7 @@ The microservice is built using Golang and is structured into several packages:
 - `config`: Handles configuration loading.
 - `internal/user`: Contains the business logic for user management, including handlers, models, and storage.
 - `internal/msgs`: Contains response messages.
+- `scripts`: Contains scripts for setting project execution.
 
 ### Endpoints
 
