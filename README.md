@@ -22,14 +22,15 @@ The microservice is built using Golang and is structured into several packages:
   - **Payload:** `{"name": "Han Solo", "email": "solo@example.com", "roles": ["Admin"]}`
   - **Response:**
     - `201 Created`: `{"id":"<user_id>", "message":"User created successfully"}`
-    - `409 Conflict`: `{"message":"User already exists"}`
+    - `409 Conflict`: `{"message":"user already exists"}`
+    - `403 Forbidden`: `{"message":"forbidden"}`
 
 #### List Users
 - **GET** `/users`
   - **Headers:** `X-User-Type: <role>`
   - **Response:**
     - `200 OK`: `[{"id":"<user_id>", "name":"<name>", "email":"<email>", "roles":["<role>"]}]`
-    - `403 Forbidden`: `{"message":"Forbidden"}`
+    - `403 Forbidden`: `{"message":"forbidden"}`
 
 #### Get User Details
 - **GET** `/users/{id}`
@@ -37,6 +38,7 @@ The microservice is built using Golang and is structured into several packages:
   - **Response:**
     - `200 OK`: `{"id":"<user_id>", "name":"<name>", "email":"<email>", "roles":["<role>"]}`
     - `404 Not Found`: `[]`
+    - `403 Forbidden`: `{"message":"forbidden"}`
 
 #### Update User Roles
 - **PUT** `/users/roles/{id}`
@@ -44,15 +46,18 @@ The microservice is built using Golang and is structured into several packages:
   - **Payload:** `{"roles": ["Modifier"]}`
   - **Response:**
     - `200 OK`: `{"message":"User roles updated successfully"}`
-    - `403 Forbidden`: `{"message":"Insufficient permissions"}`
-    - `404 Not Found`: `{"message":"User not found"}`
+    - `403 Forbidden`: `{"message":"forbidden"}`
+    - `404 Not Found`: `{"message":"user not found"}`
 
 #### Delete User
 - **DELETE** `/users/{id}`
   - **Headers:** `X-User-Type: <role>`
   - **Response:**
     - `204 No Content`
-    - `404 Not Found`: `{"message":"User not found"}`
+    - `404 Not Found`: `{"message":"user not found"}`
+    - `403 Forbidden`: `{"message":"forbidden"}`
+
+### Usage Examples
 
 ### Usage Examples
 
