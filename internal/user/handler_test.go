@@ -10,6 +10,7 @@ import (
 	"testing"
 )
 
+// setupTestStorageWithUsers initializes the storage with some test users.
 func setupTestStorageWithUsers() {
 	InitializeStorage()
 	users := []*User{
@@ -28,6 +29,7 @@ func setupTestStorageWithUsers() {
 	}
 }
 
+// TestHandleCreateUser tests the HandleCreateUser function.
 func TestHandleCreateUser(t *testing.T) {
 
 	tests := []struct {
@@ -101,10 +103,10 @@ func TestHandleCreateUser(t *testing.T) {
 				Roles: []string{"Modifier"},
 			},
 			expectedStatus: http.StatusForbidden,
-			expectedBody:   `{"message":"insufficient permissions to assign role"}`,
+			expectedBody:   `{"message":"forbidden"}`,
 		},
 	}
-
+	// Run the tests
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			jsonPayload, _ := json.Marshal(tt.payload)
@@ -137,6 +139,7 @@ func TestHandleCreateUser(t *testing.T) {
 	}
 }
 
+// TestHandleListUsers tests the HandleListUsers function.
 func TestHandleListUsers(t *testing.T) {
 	setupTestStorageWithUsers()
 
@@ -162,6 +165,7 @@ func TestHandleListUsers(t *testing.T) {
 		},
 	}
 
+	// Run the tests
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			req, err := http.NewRequest("GET", "/users", nil)
@@ -181,6 +185,7 @@ func TestHandleListUsers(t *testing.T) {
 	}
 }
 
+// TestHandleGetUser tests the HandleGetUser function.
 func TestHandleGetUser(t *testing.T) {
 	setupTestStorageWithUsers()
 
@@ -226,6 +231,7 @@ func TestHandleGetUser(t *testing.T) {
 		},
 	}
 
+	// Run the tests
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.name == "Get non-existent user with empty list" {
@@ -261,6 +267,7 @@ func TestHandleGetUser(t *testing.T) {
 	}
 }
 
+// TestHandleDeleteUser tests the HandleDeleteUser function.
 func TestHandleDeleteUser(t *testing.T) {
 	setupTestStorageWithUsers()
 
@@ -315,6 +322,7 @@ func TestHandleDeleteUser(t *testing.T) {
 		},
 	}
 
+	// Run the tests
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			req, err := http.NewRequest("DELETE", "/users/"+tt.userID, nil)
@@ -350,6 +358,7 @@ func TestHandleDeleteUser(t *testing.T) {
 	}
 }
 
+// TestHandleUpdateUserRoles tests the HandleUpdateUserRoles function.
 func TestHandleUpdateUserRoles(t *testing.T) {
 	setupTestStorageWithUsers()
 
@@ -379,7 +388,7 @@ func TestHandleUpdateUserRoles(t *testing.T) {
 				Roles: []string{"Admin"},
 			},
 			expectedStatus: http.StatusForbidden,
-			expectedBody:   map[string]string{"message": "insufficient permissions to assign role"},
+			expectedBody:   map[string]string{"message": "forbidden"},
 		},
 		{
 			name:     "Update roles for non-existent user",
@@ -393,6 +402,7 @@ func TestHandleUpdateUserRoles(t *testing.T) {
 		},
 	}
 
+	// Run the tests
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			jsonPayload, _ := json.Marshal(tt.payload)

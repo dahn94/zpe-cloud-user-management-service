@@ -7,6 +7,7 @@ import (
 	internalErrors "zpe-cloud-user-management-service/internal/msgs"
 )
 
+// User represents a user in the system.
 var (
 	mu        sync.Mutex
 	users     = make(map[string]*User)
@@ -21,6 +22,7 @@ func InitializeStorage() {
 	idCounter = 0
 }
 
+// CreateUser adds a new user to the storage.
 func CreateUser(user *User) error {
 	mu.Lock()
 	defer mu.Unlock()
@@ -38,6 +40,7 @@ func CreateUser(user *User) error {
 	return nil
 }
 
+// GetUser retrieves a user from the storage by ID.
 func GetUser(id string) (*User, error) {
 	mu.Lock()
 	defer mu.Unlock()
@@ -49,6 +52,7 @@ func GetUser(id string) (*User, error) {
 	return user, nil
 }
 
+// ListUsers returns a list of all users in the storage.
 func ListUsers() ([]*User, error) {
 	mu.Lock()
 	defer mu.Unlock()
@@ -64,6 +68,8 @@ func ListUsers() ([]*User, error) {
 
 	return userList, nil
 }
+
+// UpdateUserRoles updates the roles of a user in the storage.
 func UpdateUserRoles(id string, roles []string) error {
 	mu.Lock()
 	defer mu.Unlock()
@@ -77,6 +83,7 @@ func UpdateUserRoles(id string, roles []string) error {
 	return nil
 }
 
+// DeleteUser removes a user from the storage by ID.
 func DeleteUser(id string) error {
 	mu.Lock()
 	defer mu.Unlock()

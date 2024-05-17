@@ -8,50 +8,15 @@ import (
 	internalMsgs "zpe-cloud-user-management-service/internal/msgs"
 )
 
+// RoleUpdateRequest represents the request payload for updating a user's roles.
 type RoleUpdateRequest struct {
 	Roles []string `json:"roles"`
-}
-
-// HandleUsers handles HTTP requests for the /users endpoint.
-func HandleUsers(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodPost:
-		HandleCreateUser(w, r)
-	case http.MethodGet:
-		HandleListUsers(w, r)
-	default:
-		errResponse(w, http.StatusMethodNotAllowed, internalMsgs.ErrMethodNotAllowed)
-		log.Printf("Method not allowed: %s", r.Method)
-	}
-}
-
-// HandleUser handles HTTP requests for individual user operations at /users/{id}.
-func HandleUser(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodGet:
-		HandleGetUser(w, r)
-	case http.MethodDelete:
-		HandleDeleteUser(w, r)
-	default:
-		errResponse(w, http.StatusMethodNotAllowed, internalMsgs.ErrMethodNotAllowed)
-		log.Printf("Method not allowed: %s", r.Method)
-	}
-}
-
-// HandleUserRoles handles HTTP requests for updating user roles at /users/roles/{id}.
-func HandleUserRoles(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case http.MethodPut:
-		HandleUpdateUserRoles(w, r)
-	default:
-		errResponse(w, http.StatusMethodNotAllowed, internalMsgs.ErrMethodNotAllowed)
-		log.Printf("Method not allowed: %s", r.Method)
-	}
 }
 
 func HandleCreateUser(w http.ResponseWriter, r *http.Request) {
 	currentUserRole := r.Header.Get("X-User-Type")
 	var user User
+
 	if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 		errResponse(w, http.StatusBadRequest, internalMsgs.ErrInvalidRequestPayload)
 		log.Printf("BadRequest: %v", err)
@@ -64,11 +29,18 @@ func HandleCreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !isValidCrudOperation(currentUserRole, user.Roles[0]) {
-		errResponse(w, http.StatusForbidden, internalMsgs.ErrInsufficientPermissions)
+	if !isRoleExists(currentUserRole) {
+		errResponse(w, http.StatusForbidden, internalMsgs.ErrForbidden)
+		log.Printf("Forbidden: UserType=%s attempted to create users", currentUserRole)
+		return
+	}
+
+	if !isValidCrudOperation(currentUserRole, user.Roles...) {
+		errResponse(w, http.StatusForbidden, internalMsgs.ErrForbidden)
 		log.Printf("Forbidden: UserType=%s attempted to create a user", currentUserRole)
 		return
 	}
+
 	if err := CreateUser(&user); err != nil {
 		errResponse(w, http.StatusConflict, internalMsgs.ErrUserAlreadyExists)
 		log.Printf("Conflict: %v", err)
@@ -102,12 +74,14 @@ func HandleListUsers(w http.ResponseWriter, r *http.Request) {
 
 func HandleGetUser(w http.ResponseWriter, r *http.Request) {
 	currentUserRole := r.Header.Get("X-User-Type")
+	id := strings.TrimPrefix(r.URL.Path, "/users/")
+
 	if !isRoleExists(currentUserRole) {
 		errResponse(w, http.StatusForbidden, internalMsgs.ErrForbidden)
 		log.Printf("Forbidden: UserType=%s attempted to get a user", currentUserRole)
 		return
 	}
-	id := strings.TrimPrefix(r.URL.Path, "/users/")
+
 	if id == "" {
 		HandleListUsers(w, r)
 		return
@@ -139,25 +113,34 @@ func HandleGetUser(w http.ResponseWriter, r *http.Request) {
 func HandleDeleteUser(w http.ResponseWriter, r *http.Request) {
 	currentUserRole := r.Header.Get("X-User-Type")
 	id := strings.TrimPrefix(r.URL.Path, "/users/")
+
 	targetUserRole, err := getUserTypeByID(id)
 	if err != nil {
 		errResponse(w, http.StatusNotFound, internalMsgs.ErrUserNotFound)
-		log.Printf("User not found: %s", id)
+		log.Printf("NotFound: %v", err)
 		return
 	}
 
-	if !checkPermission(w, currentUserRole, targetUserRole) {
+	if !isRoleExists(currentUserRole) {
+		errResponse(w, http.StatusForbidden, internalMsgs.ErrForbidden)
+		log.Printf("Forbidden: UserType=%s attempted to delete a user", currentUserRole)
+		return
+	}
+
+	if !isValidCrudOperation(currentUserRole, targetUserRole) {
+		errResponse(w, http.StatusForbidden, internalMsgs.ErrForbidden)
+		log.Printf("Forbidden: UserType=%s attempted to delete a user with role %s", currentUserRole, targetUserRole)
 		return
 	}
 
 	if err := DeleteUser(id); err != nil {
-		errResponse(w, http.StatusNotFound, internalMsgs.ErrUserNotFound)
-		log.Printf("NotFound: User %s", id)
+		errResponse(w, http.StatusInternalServerError, err)
+		log.Printf("InternalServerError: %v", err)
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
-	log.Printf("UserType=%s deleted user %s", currentUserRole, id)
+	jsonResponse(w, http.StatusNoContent, nil)
+	log.Printf("User deleted: %s", id)
 }
 
 func HandleUpdateUserRoles(w http.ResponseWriter, r *http.Request) {
@@ -171,9 +154,15 @@ func HandleUpdateUserRoles(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := isValidRoleUpdate(req.Roles, currentUserRole); err != nil {
-		errResponse(w, http.StatusForbidden, internalMsgs.ErrInsufficientPermissions)
-		log.Printf("Forbidden: %v", err)
+	if !isRoleExists(currentUserRole) {
+		errResponse(w, http.StatusForbidden, internalMsgs.ErrForbidden)
+		log.Printf("Forbidden: UserType=%s attempted to update roles of a user", currentUserRole)
+		return
+	}
+
+	if !isValidCrudOperation(currentUserRole, req.Roles...) {
+		errResponse(w, http.StatusForbidden, internalMsgs.ErrForbidden)
+		log.Printf("Forbidden: %v", currentUserRole)
 		return
 	}
 

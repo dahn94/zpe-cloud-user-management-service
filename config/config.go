@@ -11,7 +11,8 @@ type Config struct {
 	// Others can be added here
 }
 
-func LoadConfig() Config {
+// LoadEnvConfig loads the configuration from the environment variables.
+func LoadEnvConfig() Config {
 	port := os.Getenv("SERVER_PORT")
 	if port == "" {
 		port = "8080"
